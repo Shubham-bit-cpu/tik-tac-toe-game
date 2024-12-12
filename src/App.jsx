@@ -1,33 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+
+import './App.css';
+import Board from './components/Board';
+import "./components/css/Board.scss"
+import { useState } from 'react';
+import {calculateWinner} from './winner';
+import Statusmessage from './components/StatusMessage';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [squares, setsquares] = useState(Array(9).fill(null));
+  const [isNextX, SetNextX] = useState(false);
+  const winner = calculateWinner(squares);
+  const nextplayer=  isNextX ? "X" : "O" ;
+  const statusmessage = winner ? `winner is ${winner}` : `winner is ${nextplayer}`;
 
+
+  
+  const handlesquareclick = clickedposition => {
+    if (squares[clickedposition] || winner) {
+      return
+    }
+    setsquares(currentsquare => {
+      return currentsquare.map((squareValue, position) => {
+        if (clickedposition === position) {
+          return isNextX ? "X" : "O";
+        }
+        return squareValue;
+      });
+    });
+
+    SetNextX(currentIsNext => !currentIsNext);
+
+  }
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className='card'>
+        <h2>Next player  is {nextplayer}</h2>
+        <Board  squares ={squares} handlesquareclick={handlesquareclick}/>
+          <Statusmessage winner={winner} isNextX={isNextX} squares={squares}/>
+        {statusmessage}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
     </>
   )
 }
